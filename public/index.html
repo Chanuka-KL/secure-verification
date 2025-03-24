@@ -1,0 +1,26 @@
+<button id="holdBtn">Hold Me</button>
+<p id="result"></p>
+<script>
+let holdStart;
+
+document.getElementById('holdBtn').onmousedown = () => {
+  holdStart = Date.now();
+  document.getElementById('result').textContent = "Holding...";
+};
+
+document.getElementById('holdBtn').onmouseup = async () => {
+  const heldTime = (Date.now() - holdStart) / 1000;
+  const res = await fetch('/api/verify', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ heldTime })
+  });
+  const data = await res.json();
+  if (data.success) {
+    document.getElementById('result').textContent = "✅ Verified!";
+    localStorage.setItem("verifyToken", data.token); // Save token
+  } else {
+    document.getElementById('result').textContent = "❌ Verification Failed";
+  }
+};
+</script>
